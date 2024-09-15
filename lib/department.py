@@ -78,7 +78,7 @@ class Department:
             WHERE id = ?
         """
 
-        CURSOR.execute(sql, (self.id,))
+        CURSOR.execute(sql, (self.id, ))
         CONN.commit()
 
         # Delete the dictionary entry using id as the key
@@ -125,7 +125,7 @@ class Department:
             WHERE id = ?
         """
 
-        row = CURSOR.execute(sql, (id,)).fetchone()
+        row = CURSOR.execute(sql, (id, )).fetchone()
         return cls.instance_from_db(row) if row else None
 
     @classmethod
@@ -137,5 +137,18 @@ class Department:
             WHERE name is ?
         """
 
-        row = CURSOR.execute(sql, (name,)).fetchone()
+        row = CURSOR.execute(sql, (name, )).fetchone()
         return cls.instance_from_db(row) if row else None
+
+    def employees(self):
+        """ Return list of employees associated with current department """
+        from employee import Employee
+        sql = """
+            SELECT *
+            FROM employees
+            WHERE department_id = ?
+        """
+        CURSOR.execute(sql, (self.id, ))
+
+        rows = CURSOR.fetchall()
+        return [Employee.instance_from_db(row) for row in rows]
